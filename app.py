@@ -42,11 +42,49 @@ if mbti in MBTI_ELEMENTS:
     df = pd.DataFrame({"element": list(elems.keys()), "score": list(elems.values())})
     st.bar_chart(df.set_index("element"))
 
-# --- 2) 사주(선택) ---
-with st.expander("사주(선택): 생년월일/출생시 입력하기"):
-    birth_date = st.date_input("생년월일 (선택)")
-    birth_time = st.time_input("출생시각 (선택, 모르면 00:00)", value=datetime.strptime("00:00","%H:%M").time())
-    time_accuracy = st.select_slider("출생시각 정확도", options=["unknown","±30m","exact"], value="unknown")
+# --- 2) 사주(선택) — 8자리 숫자 입력(YYYYMMDD) ---
+import re
+from datetime import datetime, date
+
+def parse_yyyymmdd(s: str):
+    s = re.sub(r"\D", "", s or "")        # 숫자만 추출
+    if len(s) != 8:
+        return None, "YYYYMMDD 형식(8자리)으로 입력하세요."
+    try:
+        y, m, d = int(s[:4]), int(s[4:6]), int(s[6:8])
+        dt = date(y, m, d)                # 유효 날짜 체크(윤년 포함)
+    except ValueError:
+        return None, "존재하지 않는 날짜입니다."
+    # 범위 제한 (1900-01-01 ~ 오늘)
+    if dt < date(1900,1,1):
+        return None, "19000101 이후만 허용합니다."
+    if dt > date.today():
+        return None, "미래 날짜는 입력 불가입니다."
+    return dt, None
+
+with st.expander("사주(선택): 생년월일/출생시 (숫자만)"):
+    birth_str = st.text_input(
+        "생년월일 (YYYYMMDD, 예: 19901231) — 숫자만",
+        value="", max_chars=8, help="19000101 ~ 오늘 사이"
+    )
+    birth_date, err = parse_yyyymmdd(birth_str)
+    if err and birth_str:
+        st.error(err)
+
+    # 출생 시각도 숫자 4자리 HHMM로 받기(선택)
+    time_str = st.text_input("출생시각 (HHMM, 예: 0930) — 선택", value="", max_chars=4)
+    birth_time = None
+    if time_str:
+        tnum = re.sub(r"\D", "", time_str)
+        if len(tnum) == 4 and 0 <= int(tnum[:2]) <= 23 and 0 <= int(tnum[2:]) <= 59:
+            birth_time = f"{tnum[:2]}:{tnum[2:]}"
+        else:
+            st.error("출생시각은 HHMM 형식(0000~2359)으로 입력하세요.")
+
+    time_accuracy = st.select_slider(
+        "출생시각 정확도", options=["unknown","±30m","exact"], value="unknown"
+    )
+
 
 # --- 3) 연도별 이벤트 라벨링 ---
 with st.expander("연도별 이벤트 추가(선택)"):
