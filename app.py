@@ -1,3 +1,6 @@
+__APP_VERSION__ = "watcher-off-dotted-keys-2025-10-19"
+st.caption(f"build: {__APP_VERSION__}")
+
 import streamlit as st
 from datetime import datetime
 import json, time
