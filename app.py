@@ -159,11 +159,12 @@ if st.button("제출하기"):
         "mbti": mbti,
         "elements": MBTI_ELEMENTS.get(mbti, {}),
         "birth_date": str(birth_date) if birth_date else "",
-        "birth_time": birth_time.strftime("%H:%M") if birth_time else "",
+        "birth_time": birth_time if birth_time else "",   # ✅ 수정된 부분
         "time_accuracy": time_accuracy,
         "events": event_payload,
         "name_alias": name_alias
     }
+
     if not consent:
         st.warning("동의 체크가 필요합니다.")
     else:
