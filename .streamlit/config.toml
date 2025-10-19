@@ -1,6 +1,4 @@
-﻿[server]
-fileWatcherType = "none"
-runOnSave = false
-
-[client]
-toolbarMode = "minimal"
+﻿# .streamlit/config.toml  ← 섹션표기 X, 점 표기만 사용
+server.fileWatcherType = "none"
+server.runOnSave = false
+client.toolbarMode = "minimal"
