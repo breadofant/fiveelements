@@ -1,2 +1,11 @@
 # Streamlit local secrets
 .streamlit/secrets.toml
+
+# Claude Code
+.claude/
+
+# Temp files
+nul
+_ul
+__pycache__/
+*.pyc
