@@ -83,7 +83,24 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin: 15px 0;
     }
+    /* Mobile: prevent jump to top on button click */
+    .stButton button {
+        scroll-margin-top: 100px;
+    }
 </style>
+<script>
+// Auto-scroll to last interacted element (mobile fix)
+window.addEventListener('load', function() {
+    const lastFocused = sessionStorage.getItem('lastFocusedElement');
+    if (lastFocused) {
+        const elem = document.getElementById(lastFocused);
+        if (elem) {
+            elem.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+        sessionStorage.removeItem('lastFocusedElement');
+    }
+});
+</script>
 """, unsafe_allow_html=True)
 
 # ===== 세션 상태 =====
@@ -118,7 +135,7 @@ if st.session_state.stage >= 1:
                 st.session_state.mbti = mbti
                 if st.session_state.stage == 1:
                     st.session_state.stage = 1.5
-                    st.rerun()
+                # rerun 제거 - 자동으로 아래 섹션 표시
 
     if st.session_state.mbti:
         st.success(f"✅ 선택: **{st.session_state.mbti}**")
@@ -189,11 +206,9 @@ if st.session_state.stage == 1.5 and st.session_state.mbti:
     with col_a:
         if st.button("➡️ 생년월일 추가하기", type="primary", use_container_width=True):
             st.session_state.stage = 2
-            st.rerun()
     with col_b:
         if st.button("⏭️ 이 정도로 충분 (제출)", use_container_width=True):
             st.session_state.stage = 4
-            st.rerun()
 
 # ===== 2단계: 생년월일 =====
 if st.session_state.stage >= 2 and st.session_state.stage < 3:
@@ -213,11 +228,9 @@ if st.session_state.stage >= 2 and st.session_state.stage < 3:
         if st.button("✅ 확인", type="primary", use_container_width=True):
             st.session_state.birth_date = birth
             st.session_state.stage = 2.5
-            st.rerun()
     with col2:
         if st.button("⏭️ 건너뛰기", use_container_width=True):
             st.session_state.stage = 3
-            st.rerun()
 
 # ===== 2.5단계: 정밀 프로필 =====
 if st.session_state.stage == 2.5 and st.session_state.mbti and st.session_state.birth_date:
@@ -304,11 +317,9 @@ if st.session_state.stage == 2.5 and st.session_state.mbti and st.session_state.
     with col1:
         if st.button("➡️ 이벤트 추가하기", type="primary", use_container_width=True):
             st.session_state.stage = 3
-            st.rerun()
     with col2:
         if st.button("⏭️ 바로 제출", use_container_width=True):
             st.session_state.stage = 4
-            st.rerun()
 
 # ===== 3단계: 이벤트 입력 =====
 if st.session_state.stage >= 3 and st.session_state.stage < 4:
@@ -341,7 +352,6 @@ if st.session_state.stage >= 3 and st.session_state.stage < 4:
 
     if st.button("✅ 완료 및 제출", type="primary", use_container_width=True):
         st.session_state.stage = 4
-        st.rerun()
 
 # ===== 4단계: 최종 리포트 =====
 if st.session_state.stage == 4:
@@ -475,7 +485,8 @@ if st.session_state.stage == 4:
         st.json(row)
 
 # ===== 리셋 버튼 =====
-if st.button("🔄 처음부터 다시"):
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-    st.rerun()
+with st.sidebar:
+    if st.button("🔄 처음부터 다시", use_container_width=True):
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()  # 리셋만 rerun 유지
