@@ -293,7 +293,7 @@ with col1:
 with col2:
     st.subheader("오행 비중")
     df_elem = pd.DataFrame({"오행": ELEM_LIST, "비중": [weights[e] for e in ELEM_LIST]})
-    st.bar_chart(df_elem.set_index("오행"), color=[ELEM_COLORS[e] for e in ELEM_LIST])
+    st.bar_chart(df_elem.set_index("오행"))
 
 # --- 6-2) MBTI 후보 추론
 st.subheader("가능한 MBTI 후보")
